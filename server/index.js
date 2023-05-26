@@ -6,17 +6,25 @@ const app = express();
 
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('hallo');
-});
-const httpServer = createServer();
-const io = new Server({
+const server = createServer(app);
+const io = new Server(server, {
+  allowEIO3: true,
   cors: {
     origin: 'http://localhost:3000',
-    methods: ['GET', 'PUT', 'PATCH', 'DELETE', 'POST'],
+    methods: ['GET', 'POST'],
   },
 });
 
-io.on('connection', (socket) => {});
+io.on('connection', (socket) => {
+  console.log(`socket ${socket.id} connected`);
 
-httpServer.listen(3001, () => console.log('Server Running in port 3000 '));
+  socket.on('send_message', (data) => {
+    socket.broadcast.emit('receive_message');
+  });
+
+  socket.on('connect_error', (err) => {
+    console.log(`connect_error due to ${err.message}`);
+  });
+});
+
+server.listen(3001, () => console.log('Server Running in port 3000 '));
