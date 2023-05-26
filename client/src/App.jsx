@@ -25,7 +25,10 @@ function App() {
   return (
     <div className='min-h-screen '>
       <div>
-        <form className='flex justify-center items-center min-h-[100px]'>
+        <form
+          className='flex justify-center items-center min-h-[100px]'
+          onSubmit={handleMessage}
+        >
           <label htmlFor='message'></label>
           <input
             className='px-2 py-2 outline outline-slate-50 border border-neutral-200 rounded-full mb-3'
@@ -39,7 +42,6 @@ function App() {
           <button
             type='submit'
             className='px-4 py-2 bg-gray-500 text-white rounded-full'
-            onClick={handleMessage}
           >
             Send Message
           </button>
