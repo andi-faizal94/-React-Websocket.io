@@ -8,20 +8,20 @@ function App() {
   const [message, setMessage] = useState('');
   const [messageReceived, setMessageReceived] = useState('');
 
+  useEffect(() => {
+    socket.on('receive_message', (data) => {
+      setMessageReceived(data.message);
+    });
+    return () => {
+      socket.off('receive_message');
+    };
+  }, [message]);
+
   const handleMessage = (e) => {
     e.preventDefault();
     socket.emit('send_message', { message: message });
     setMessage('');
   };
-
-  useEffect(() => {
-    socket.on('receive_message', (data) => {
-      setMessageReceived(data?.message);
-    });
-    return () => {
-      socket.off('receive_message');
-    };
-  }, []);
   return (
     <div className='min-h-screen '>
       <div>
@@ -46,7 +46,8 @@ function App() {
             Send Message
           </button>
         </form>
-        <h1> person: {messageReceived}</h1>
+        <h1> person 1: {messageReceived}</h1>
+        <h1> person 2: {messageReceived}</h1>
       </div>
     </div>
   );
