@@ -16,14 +16,16 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log(`socket ${socket.id} connected`);
+  console.log(`A User connected`);
 
   socket.on('send_message', (data) => {
-    socket.broadcast.emit('receive_message');
+    console.log('Received message:', data.message);
+
+    io.emit('receive_message', { message: data.message });
   });
 
-  socket.on('connect_error', (err) => {
-    console.log(`connect_error due to ${err.message}`);
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
   });
 });
 
