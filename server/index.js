@@ -15,17 +15,24 @@ const io = new Server(server, {
   },
 });
 
+const activeSockets = new Set();
+
 io.on('connection', (socket) => {
   console.log(`A User connected`);
 
+  socket.on('join_room', (room) => {
+    socket.join(room);
+    console.log(`User joined room: ${room}`);
+  });
+
   socket.on('send_message', (data) => {
     console.log('Received message:', data.message);
-
-    io.emit('receive_message', { message: data.message });
+    io.to(data.room).emit('receive_message', { message: data.message });
   });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected');
+    activeSockets.delete(socket.id);
   });
 });
 
