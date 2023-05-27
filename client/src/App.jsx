@@ -7,24 +7,44 @@ const socket = io.connect('http://localhost:3001');
 function App() {
   const [message, setMessage] = useState('');
   const [messageReceived, setMessageReceived] = useState('');
+  const [chatLog, setChatLog] = useState([]);
 
   useEffect(() => {
     socket.on('receive_message', (data) => {
       setMessageReceived(data.message);
+      setChatLog((prevChatLog) => {
+        if (!prevChatLog.includes(data.message)) {
+          return [...prevChatLog, data.message];
+        }
+        return prevChatLog;
+      });
     });
     return () => {
       socket.off('receive_message');
     };
-  }, [message]);
+  }, []);
+
+  useEffect(() => {
+    const room = 'room-1'; // Ganti dengan nama ruangan yang sesuai
+    socket.emit('join_room', room);
+  }, []);
 
   const handleMessage = (e) => {
     e.preventDefault();
-    socket.emit('send_message', { message: message });
+    const room = 'room-1'; // Ganti dengan nama ruangan yang sesuai
+    const data = { message: message, room: room };
+    socket.emit('send_message', data);
+    setChatLog((prevChatLog) => [...prevChatLog, message]);
     setMessage('');
   };
   return (
     <div className='min-h-screen '>
       <div>
+        <div>
+          {chatLog.map((message, index) => (
+            <div key={index}>{message}</div>
+          ))}
+        </div>
         <form
           className='flex justify-center items-center min-h-[100px]'
           onSubmit={handleMessage}
@@ -46,8 +66,7 @@ function App() {
             Send Message
           </button>
         </form>
-        <h1> person 1: {messageReceived}</h1>
-        <h1> person 2: {messageReceived}</h1>
+        <h1>Received message: {messageReceived}</h1>{' '}
       </div>
     </div>
   );
